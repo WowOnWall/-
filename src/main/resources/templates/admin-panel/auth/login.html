@@ -36,18 +36,18 @@
             <div class="login-box ptb--100">
                     <form th:action="@{/login}" method="post">
                     <div class="login-form-head">
-                        <h4>Sign In</h4>
+                        <h4>钓鱼管理系统入口</h4>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
                             <label for="exampleInputEmail1">Username</label>
-                            <input type="text" name="username" id="exampleInputEmail1" value="admin">
+                            <input type="text" name="username" id="exampleInputEmail1">
                             <i class="ti-user"></i>
                             <div class="text-danger"></div>
                         </div>
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
-                            <input type="password" name="password" id="exampleInputPassword1" value="admin">
+                            <input type="password" name="password" id="exampleInputPassword1">
                             <i class="ti-lock"></i>
                             <div class="text-danger"></div>
                         </div>
@@ -55,15 +55,15 @@
                             <div class="col-6">
                                 <div class="custom-control custom-checkbox mr-sm-2">
                                     <input type="checkbox" class="custom-control-input" id="customControlAutosizing">
-                                    <label class="custom-control-label" for="customControlAutosizing">Remember Me</label>
+                                    <label class="custom-control-label" for="customControlAutosizing">记住密码</label>
                                 </div>
                             </div>
                             <div class="col-6 text-right">
-                                <a href="#">Forgot Password?</a>
+                                <a href="#">找回密码</a>
                             </div>
                         </div>
                         <div class="submit-btn-area">
-                            <button id="login_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
+                            <button id="login_submit" type="submit">登录 <i class="ti-arrow-right"></i></button>
                         </div>
                     </div>
                 </form>

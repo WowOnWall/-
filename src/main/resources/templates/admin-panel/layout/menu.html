@@ -1,7 +1,7 @@
-<div class="sidebar-menu" th:fragment="menu">
+<div class="sidebar-menu" th:fragment="menu" xmlns:sec="http://www.w3.org/1999/xhtml">
     <div class="sidebar-header">
         <div class="logo">
-            <a href="index.html"><img src="/assets/images/icon/logo.png" alt="logo"></a>
+            <a th:href="@{/index.html}"><img src="/assets/images/icon/name.png" alt="logo"></a>
         </div>
     </div>
     <div class="main-menu">
@@ -9,13 +9,16 @@
             <nav>
                 <ul class="metismenu" id="menu">
                     <li sec:authorize="hasAuthority('Dashboard_INDEX')" th:classappend="${#httpServletRequest.getRequestURI() == '/dashboard' ? 'active':''}">
-                    	<a th:href="@{/dashboard}"><i class="ti-dashboard"></i><span>Dashboard</span></a>
+                    	<a th:href="@{/dashboard}"><i class="ti-dashboard"></i><span>数据看板</span></a>
                     </li>
                     <li sec:authorize="hasAuthority('Role_INDEX')" th:classappend="${#httpServletRequest.getRequestURI() == '/role' ? 'active':''}">
-                    	<a th:href="@{/role}"><i class="ti-shield"></i><span>Role</span></a>
+                    	<a th:href="@{/role}"><i class="ti-shield"></i><span>用户权限</span></a>
                     </li>
                     <li sec:authorize="hasAuthority('User_INDEX')" th:classappend="${#httpServletRequest.getRequestURI() == '/user' ? 'active':''}">
-                    	<a th:href="@{/user}"><i class="ti-user"></i><span>User</span></a>
+                    	<a th:href="@{/user}"><i class="ti-user"></i><span>用户管理</span></a>
+                    </li>
+                    <li sec:authorize="hasAuthority('User_INDEX')" th:classappend="${#httpServletRequest.getRequestURI() == '/client' ? 'active':''}">
+                        <a th:href="@{/client}"><i class="ti-anchor"></i><span>钓鱼信息</span></a>
                     </li>
                 </ul>
             </nav>

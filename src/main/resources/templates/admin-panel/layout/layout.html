@@ -3,7 +3,7 @@
 	  th:fragment="layout(title, section, script, pageTitle)">
 	
 <head>
-	<title th:replace="${title}">SBAP</title>
+	<title th:replace="${title}">钓鱼信息记录</title>
 	<th:block th:include="admin-panel/layout/head :: head"/>
 </head>
 
@@ -38,11 +38,11 @@
 					<div class="col-sm-6 clearfix">
 						<div class="user-profile pull-right">
 							<h4 class="user-name dropdown-toggle" data-toggle="dropdown" >
-								<span sec:authentication="name">Username</span>
+								<span sec:authentication="name">用户名</span>
 								<i class="fa fa-angle-down"></i>
 							</h4>
 							<div class="dropdown-menu">
-								<a class="dropdown-item" th:href="@{/logout}">Log Out</a>
+								<a class="dropdown-item" th:href="@{/logout}">注销</a>
 							</div>
 							<ul class="notification-area pull-right">
 								<li class="settings-btn"><i class="ti-settings"></i></li>

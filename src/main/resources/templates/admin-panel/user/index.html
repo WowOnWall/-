@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" 
 	th:replace="admin-panel/layout/layout :: layout(~{::title}, ~{::section}, ~{::script}, ~{::h4.page-title})">
 
-<title>User</title>
+<title>用户管理</title>
 
-<h4 class="page-title pull-left">User</h4>
+<h4 class="page-title pull-left">用户管理</h4>
 
 <section>
 	<div class="row mb-3">
@@ -12,11 +12,11 @@
             <h2 class="mb-0"></h2>
         </div>
 		<div class="col-md-auto mt-2">
-			<a th:href="@{/user/create}" class="btn btn-primary">Create User</a>
+			<a th:href="@{/user/create}" class="btn btn-primary">创建用户</a>
 	    </div>
     </div>	
 
-	<div class="row">
+	<div class="row" >
 	    <!-- data table start -->
 	    <div class="col-12">
 	        <div class="card">

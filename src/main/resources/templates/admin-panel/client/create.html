@@ -1,0 +1,154 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin-panel/layout/layout :: layout(~{::title}, ~{::section}, ~{::script}, ~{::h4.page-title})">
+
+    <title>客户端信息录入</title>
+
+    <h4 class="page-title pull-left">新建客户端记录</h4>
+
+    <section>
+        <form id="client-info-form" method="POST" th:action="@{/client_info/create}" th:object="${clientInfoDTO}">
+            <div class="list-group" style="padding: 15px;">
+                <!-- 基础信息 -->
+                <div class="list-group-item">
+                    <h5 class="mb-3"><i class="fas fa-desktop"></i> 设备信息</h5>
+                    <div class="form-group row">
+                        <label for="platform" class="col-md-2 col-form-label">操作系统</label>
+                        <div class="col-md-8">
+                            <select name="platform" id="platform" class="form-control" required>
+                                <option value="">请选择平台</option>
+                                <option value="Windows">Windows</option>
+                                <option value="macOS">macOS</option>
+                                <option value="Linux">Linux</option>
+                                <option value="Android">Android</option>
+                                <option value="iOS">iOS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="user_agent" class="col-md-2 col-form-label">用户代理</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="user_agent"
+                                   name="user_agent" required placeholder="Mozilla/5.0...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 硬件信息 -->
+                <div class="list-group-item">
+                    <h5 class="mb-3"><i class="fas fa-microchip"></i> 硬件配置</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="cpu_cores">CPU核心数</label>
+                            <input type="number" class="form-control" id="cpu_cores"
+                                   name="cpu_cores" min="1" max="64" value="4" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="device_memory">内存容量 (GB)</label>
+                            <input type="number" class="form-control" id="device_memory"
+                                   name="device_memory" step="0.1" min="0.5" max="256" value="8" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 网络与位置 -->
+                <div class="list-group-item">
+                    <h5 class="mb-3"><i class="fas fa-globe-asia"></i> 网络与地理位置</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="ip">IP地址</label>
+                            <input type="text" class="form-control" id="ip"
+                                   name="ip" pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                   required placeholder="192.168.1.1">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="connection_type">网络类型</label>
+                            <select class="form-control" id="connection_type" name="connection_type">
+                                <option value="4g">4G移动网络</option>
+                                <option value="wifi">Wi-Fi</option>
+                                <option value="ethernet">有线网络</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="country">国家代码</label>
+                            <input type="text" class="form-control" id="country"
+                                   name="country" maxlength="2" placeholder="CN"
+                                   pattern="[A-Z]{2}" title="两位大写国家代码">
+                        </div>
+                    </div>
+
+                    <div class="form-row mt-2">
+                        <div class="form-group col-md-6">
+                            <label for="coordinates">地理坐标</label>
+                            <div class="input-group">
+                                <input type="number" step="0.000001" class="form-control"
+                                       id="latitude" name="latitude" placeholder="纬度"
+                                       min="-90" max="90">
+                                <input type="number" step="0.000001" class="form-control"
+                                       id="longitude" name="longitude" placeholder="经度"
+                                       min="-180" max="180">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 显示信息 -->
+                <div class="list-group-item">
+                    <h5 class="mb-3"><i class="fas fa-tv"></i> 显示设置</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="screen_resolution">屏幕分辨率</label>
+                            <input type="text" class="form-control" id="screen_resolution"
+                                   name="screen_resolution" placeholder="1920x1080"
+                                   pattern="\d+x\d+">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="viewport_size">视口尺寸</label>
+                            <input type="text" class="form-control" id="viewport_size"
+                                   name="viewport_size" placeholder="1200x800"
+                                   pattern="\d+x\d+">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="list-group-item bg-light text-left text-md-right pb-1">
+                    <button type="reset" class="btn btn-secondary mb-2">重置表单</button>
+                    <button type="submit" class="btn btn-primary mb-2">提交信息</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            initFormValidation();
+        });
+
+        function initFormValidation() {
+            $('#client-info-form').submit(function(event) {
+                // 验证地理坐标
+                const lat = parseFloat($('#latitude').val());
+                const lng = parseFloat($('#longitude').val());
+
+                if ((isNaN(lat) && !isNaN(lng)) || (!isNaN(lat) && isNaN(lng))) {
+                    alert('经纬度必须同时填写或留空');
+                    event.preventDefault();
+                    return;
+                }
+
+                // 验证国家代码
+                const countryCode = $('#country').val();
+                if (countryCode && !/^[A-Z]{2}$/.test(countryCode)) {
+                    alert('国家代码必须为两位大写字母');
+                    event.preventDefault();
+                    return;
+                }
+
+                // 其他自动验证通过HTML5属性完成
+            });
+        }
+    </script>
+
+</html>

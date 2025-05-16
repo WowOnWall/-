@@ -1,0 +1,206 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin-panel/layout/layout :: layout(~{::title}, ~{::section}, ~{::script}, ~{::h4.page-title})">
+
+    <title>客户端访问监控</title>
+
+    <h4 class="page-title pull-left">实时访问日志</h4>
+
+    <section>
+        <div class="row">
+            <!-- data table start -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="data-tables">
+                            <table id="client_info_table" class="display compact" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>#ID</th>
+                                        <th>访问时间</th>
+                                        <th>IP地址</th>
+                                        <th>地理位置</th>
+                                        <th>设备类型</th>
+                                        <th>分辨率</th>
+                                        <th>网络</th>
+                                        <th>详情</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- data table end -->
+        </div>
+        <div th:replace="admin-panel/element/snackbar :: snackbar"></div>
+    </section>
+
+    <script>
+        $(document).ready( function () {
+            initDatatable();
+        });
+
+        function initDatatable() {
+            let table = $('#client_info_table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: 'api/datatable/client_info',
+                columns: [
+                    {
+                        data: 'id',
+                        className: 'text-center',
+                        render: DataTable.render.number(',', '.', 0, '', 'ID-')
+                    },
+                    {
+                        data: 'timestamp',
+                        render: function(data) {
+                            return `<span class="text-nowrap">${new Date(data).toLocaleString()}</span>`;
+                        }
+                    },
+                    {
+                        data: 'ip',
+                        render: function(data, type, row) {
+                            return `<div class="ip-address">
+                              <span>${data}</span>
+                              ${row.forwarded_for ? `<small class="text-muted">(${row.forwarded_for})</small>` : ''}
+                            </div>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data) {
+                            return `<div class="geo-info">
+                              <i class="fa fa-map-marker-alt"></i>
+                              ${[data.country, data.region, data.city].filter(Boolean).join(' · ')}
+                            </div>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data) {
+                            return `<div class="device-info">
+                              <span class="badge badge-info">${data.platform}</span>
+                              <div class="text-muted small">${data.user_agent}</div>
+                            </div>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        className: 'text-center',
+                        render: function(data) {
+                            return `<div>
+                              <span class="text-primary">${data.screen_resolution}</span>
+                              <div class="text-muted small">${data.viewport_size}</div>
+                            </div>`;
+                        }
+                    },
+                    {
+                        data: 'connection_type',
+                        className: 'text-center',
+                        render: function(data) {
+                            const icon = data.includes('4g') ? 'fa-bolt' : data.includes('wifi') ? 'fa-wifi' : 'fa-network-wired';
+                            return `<i class="fas ${icon} fa-lg text-success"></i>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        className: 'text-center',
+                        orderable: false,
+                        render: function(data) {
+                            return `<button class="btn btn-sm btn-outline-primary"
+                              onclick="showDetail(${data.id})">
+                              <i class="fas fa-search-plus"></i>
+                            </button>`;
+                        }
+                    }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/zh-CN.json'
+                },
+                order: [[1, 'desc']]
+            });
+        }
+
+        function showDetail(id) {
+            // 通过AJAX获取详细数据
+            $.get(`api/client_info/${id}`, function(data) {
+                const modalContent = `
+        <div class="modal fade" id="detailModal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title">访问详情 #${data.id}</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-desktop"></i> 设备信息</h6>
+                                <dl class="row mb-4">
+                                    <dt class="col-sm-4">平台类型</dt>
+                                    <dd class="col-sm-8">${data.platform}</dd>
+
+                                    <dt class="col-sm-4">用户代理</dt>
+                                    <dd class="col-sm-8"><code>${data.user_agent}</code></dd>
+
+                                    <dt class="col-sm-4">CPU核心</dt>
+                                    <dd class="col-sm-8">${data.cpu_cores} 核心</dd>
+
+                                    <dt class="col-sm-4">设备内存</dt>
+                                    <dd class="col-sm-8">${data.device_memory} GB</dd>
+                                </dl>
+
+                                <h6><i class="fas fa-network-wired"></i> 网络信息</h6>
+                                <dl class="row mb-4">
+                                    <dt class="col-sm-4">连接类型</dt>
+                                    <dd class="col-sm-8">${data.connection_type}</dd>
+
+                                    <dt class="col-sm-4">语言</dt>
+                                    <dd class="col-sm-8">${data.language}</dd>
+
+                                    <dt class="col-sm-4">时区</dt>
+                                    <dd class="col-sm-8">${data.time_zone}</dd>
+                                </dl>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-map-marked-alt"></i> 地理信息</h6>
+                                <dl class="row mb-4">
+                                    <dt class="col-sm-4">IP地址</dt>
+                                    <dd class="col-sm-8">${data.ip}</dd>
+
+                                    <dt class="col-sm-4">地理位置</dt>
+                                    <dd class="col-sm-8">
+                                        ${data.country} / ${data.region} / ${data.city}<br>
+                                        <small class="text-muted">坐标: ${data.latitude}, ${data.longitude}</small>
+                                    </dd>
+
+                                    <dt class="col-sm-4">反向代理</dt>
+                                    <dd class="col-sm-8">${data.forwarded_for || '无'}</dd>
+                                </dl>
+
+                                <h6><i class="fas fa-chart-area"></i> 显示信息</h6>
+                                <dl class="row">
+                                    <dt class="col-sm-4">屏幕分辨率</dt>
+                                    <dd class="col-sm-8">${data.screen_resolution}</dd>
+
+                                    <dt class="col-sm-4">视口尺寸</dt>
+                                    <dd class="col-sm-8">${data.viewport_size}</dd>
+
+                                    <dt class="col-sm-4">浏览器插件</dt>
+                                    <dd class="col-sm-8">${data.plugins.split(', ').join('<br>')}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+                $(modalContent).modal('show');
+            });
+        }
+    </script>
+
+</html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin-panel/layout/layout :: layout(~{::title}, ~{::section}, ~{::script}, ~{::h4.page-title})">
+
+    <title>客户端信息更新</title>
+
+    <h4 class="page-title pull-left">编辑访问记录</h4>
+
+    <section>
+        <form id="client-info-form" method="POST" th:action="@{|/client_info/update/${clientInfo.id}|}" th:object="${clientInfoUpdateDTO}">
+            <div class="list-group" style="padding: 15px;">
+                <!-- 设备信息 -->
+                <div class="list-group-item">
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">设备平台</label>
+                        <div class="col-md-8">
+                            <select class="form-control" name="platform" required>
+                                <option th:each="os : ${platformOptions}"
+                                        th:value="${os}"
+                                        th:text="${os}"
+                                        th:selected="${os == clientInfo.platform}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">用户代理</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control"
+                                   th:field="*{userAgent}"
+                                   required
+                                   pattern=".{10,}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 硬件配置 -->
+                <div class="list-group-item">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>CPU核心数</label>
+                            <input type="number" class="form-control"
+                                   th:field="*{cpuCores}"
+                                   min="1" max="64" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>内存容量 (GB)</label>
+                            <input type="number" class="form-control"
+                                   th:field="*{deviceMemory}"
+                                   step="0.1" min="0.5" max="256" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 网络与定位 -->
+                <div class="list-group-item">
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">网络类型</label>
+                        <div class="col-md-8">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label th:each="connType : ${T(com.example.constant.ConnectionType).values()}"
+                                       class="btn btn-outline-secondary"
+                                       th:classappend="${connType == clientInfo.connectionType} ? 'active' : ''">
+                                    <input type="radio" th:field="*{connectionType}"
+                                           th:value="${connType}"
+                                           th:checked="${connType == clientInfo.connectionType}"
+                                           autocomplete="off">
+                                    <span th:text="${connType.label}"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">地理坐标</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="number" class="form-control"
+                                       th:field="*{latitude}"
+                                       step="0.000001"
+                                       placeholder="纬度"
+                                       min="-90" max="90">
+                                <input type="number" class="form-control"
+                                       th:field="*{longitude}"
+                                       step="0.000001"
+                                       placeholder="经度"
+                                       min="-180" max="180">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 显示设置 -->
+                <div class="list-group-item">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>屏幕分辨率</label>
+                            <input type="text" class="form-control"
+                                   th:field="*{screenResolution}"
+                                   placeholder="1920x1080"
+                                   pattern="\d+[x*]\d+">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>视口尺寸</label>
+                            <input type="text" class="form-control"
+                                   th:field="*{viewportSize}"
+                                   placeholder="1200x800"
+                                   pattern="\d+[x*]\d+">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="list-group-item bg-light text-left text-md-right pb-1">
+                    <button type="button" class="btn btn-secondary mb-2" onclick="history.back()">取消</button>
+                    <button type="submit" class="btn btn-primary mb-2">保存更改</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            initFormValidation();
+        });
+
+        function initFormValidation() {
+            $('#client-info-form').submit(function(event) {
+                // 坐标成对验证
+                const lat = parseFloat($('*[name="latitude"]').val());
+                const lng = parseFloat($('*[name="longitude"]').val());
+
+                if ((!isNaN(lat) && isNaN(lng)) || (isNaN(lat) && !isNaN(lng))) {
+                    alert('经纬度必须同时填写或留空');
+                    event.preventDefault();
+                    return;
+                }
+
+                // 分辨率格式验证
+                const resPattern = /\d+[x*]\d+/;
+                if (!resPattern.test($('*[name="screenResolution"]').val())) {
+                    alert('分辨率格式错误，示例: 1920x1080');
+                    event.preventDefault();
+                }
+            });
+        }
+    </script>
+
+</html>
