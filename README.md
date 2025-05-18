@@ -8,7 +8,9 @@
 > 默认使用数据库sbap和client_info表，初始化会创建user和admin用户，密码也为admin
 
 <img src="https://raw.githubusercontent.com/WowOnWall/Drawing-bed/main/202505181659596.jpg">
+
 # page
+
 + 权限分配
 + 用户创建
 + 客户端信息
