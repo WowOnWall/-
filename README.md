@@ -1,28 +1,20 @@
-# spring-boot-basic-admin-panel
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-
 # Overview
-Provide a basic admin panel base on Spring boot and MySQL.\
-SBAP provide basic CRUD function of User, Role and Permission management.\
-Use Thymeleaf for template engine.
+二开了该开源库作为毕设的一个后台，主要逻辑是根据ip定位地址，并尽可能多的收集客户端信息记录下来
+架构为MVC,使用以下资源:
+- Sqringboot
+- mysql
+- thymeleaf
+- cesium
+> 默认使用数据库sbap和client_info表，初始化会创建user和admin用户，密码也为admin
 
-## Screenshot
-<img src="https://i.imgur.com/RuOiATV.png">
-<img src="https://i.imgur.com/frHWSdO.png">
-<img src="https://i.imgur.com/eDVfWoc.png">
+<img src="https://raw.githubusercontent.com/WowOnWall/Drawing-bed/main/202505181659596.jpg">
+# page
++ 权限分配
++ 用户创建
++ 客户端信息
++ 地图定位
+# Screenshot
+<img src="https://raw.githubusercontent.com/WowOnWall/Drawing-bed/main/202505181653622.png">
+<img src="https://raw.githubusercontent.com/WowOnWall/Drawing-bed/main/202505181651554.png">
+<img src="https://raw.githubusercontent.com/WowOnWall/Drawing-bed/main/202505181654884.png">
 
-## Used Dependencies
-* lombok
-* Passay
-* JUnit
-* Gson
-
-## TODO
-- [ ] Assign Permission per view.
-- [ ] Release a Demo Admin panel
-
-### Authors
-IMYCC
-
-Html Templates is [srtdash-admin-dashboard](https://github.com/puikinsh/srtdash-admin-dashboard)\
-[Colorlib](https://colorlib.com) is the original author of this template.
