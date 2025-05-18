@@ -22,11 +22,12 @@ import lombok.experimental.Accessors;
 })
 @Setter
 @Getter
-@Accessors(chain=true)
+@Accessors(chain = true)
 public class UserCreateDTO {
 
 	@NotEmpty
 	private String name;
+
 	@NotEmpty
 	private String username;
 
@@ -39,7 +40,8 @@ public class UserCreateDTO {
 	private String password;
 
 	@NotEmpty
-	@ValidPassword
+	private String confirmPassword; // ✅ 必须添加的字段
+
+	@NotEmpty
 	private List<Integer> roles;
-	
 }

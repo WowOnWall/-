@@ -4,121 +4,112 @@
 
     <title>客户端访问详情</title>
 
-    <h4 class="page-title pull-left">访问记录列表</h4>
+    <h4 class="page-title pull-left">访问详情</h4>
 
     <section>
-        <div class="list-group" style="padding: 15px;" th:each="client : ${clients}">
-            <!-- 遍历每个客户端记录 -->
-            <div class="list-group-item mb-3" >
-                <!-- 基础信息 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">记录ID</div>
-                        <div class="col-md-8" th:text="${client.id}">#00123</div>
-                    </div>
-                </div>
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${clientVO != null}">
+                    <h5 class="mb-4">访问记录 #ID-<span th:text="${clientVO.id}"></span></h5>
 
-                <!-- 时间信息 -->
-                <div class="list-group-item">
                     <div class="row">
-                        <div class="col-md-2 font-weight-bold">访问时间</div>
-                        <div class="col-md-8">
-                            <span th:text="${#dates.format(client.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
-                            <small class="text-muted ml-2"
-                                   th:text="'(' + ${client.timeZone} + ')'"></small>
+                        <!-- 左侧设备 & 网络 -->
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-desktop"></i> 设备信息</h6>
+                            <dl class="row mb-4">
+                                <dt class="col-sm-4">平台类型</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge badge-info" th:text="${clientVO.platform}"></span>
+                                </dd>
+
+                                <dt class="col-sm-4">用户代理</dt>
+                                <dd class="col-sm-8"><code th:text="${clientVO.userAgent}"></code></dd>
+
+                                <dt class="col-sm-4">CPU 核心</dt>
+                                <dd class="col-sm-8" th:text="${clientVO.cpuCores + ' 核心'}"></dd>
+
+                                <dt class="col-sm-4">设备内存</dt>
+                                <dd class="col-sm-8" th:text="${clientVO.deviceMemory + ' GB'}"></dd>
+                            </dl>
+
+                            <h6><i class="fas fa-network-wired"></i> 网络信息</h6>
+                            <dl class="row mb-4">
+                                <dt class="col-sm-4">连接类型</dt>
+                                <dd class="col-sm-8">
+                                    <i class="fa-lg text-success mr-1"
+                                       th:classappend="
+                                        ${#strings.containsIgnoreCase(clientVO.connectionType, '5g')} ? 'fa-signal' :
+                                        (${#strings.containsIgnoreCase(clientVO.connectionType, '4g')} ? 'fa-bolt' :
+                                        (${#strings.containsIgnoreCase(clientVO.connectionType, '3g')} ? 'fa-signal' :
+                                        (${#strings.containsIgnoreCase(clientVO.connectionType, 'wifi')} ? 'fa-wifi' :
+                                        'fa-network-wired')))">
+                                    </i>
+                                    <span th:text="${clientVO.connectionType}"></span>
+                                </dd>
+
+
+                                <dt class="col-sm-4">语言</dt>
+                                <dd class="col-sm-8" th:text="${clientVO.language}"></dd>
+
+                                <dt class="col-sm-4">时区</dt>
+                                <dd class="col-sm-8" th:text="${clientVO.timeZone}"></dd>
+                            </dl>
+                        </div>
+
+                        <!-- 右侧地理 & 显示 -->
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-map-marked-alt"></i> 地理信息</h6>
+                            <dl class="row mb-4">
+                                <dt class="col-sm-4">访问时间</dt>
+                                <dd class="col-sm-8">
+                                    <span class="text-nowrap" th:text="${clientVO.timestamp}"></span>
+                                </dd>
+
+                                <dt class="col-sm-4">IP 地址</dt>
+                                <dd class="col-sm-8">
+                                    <span th:text="${clientVO.ip}"></span>
+                                    <small class="text-muted" th:if="${clientVO.forwardedFor}">
+                                        (<span th:text="${clientVO.forwardedFor}"></span>)
+                                    </small>
+                                </dd>
+
+                                <dt class="col-sm-4">地理位置</dt>
+                                <dd class="col-sm-8">
+                                    <span th:text="${clientVO.country + ' · ' + clientVO.region + ' · ' + clientVO.city}"></span><br/>
+                                    <small class="text-muted" th:text="${'坐标: ' + clientVO.latitude + ', ' + clientVO.longitude}"></small>
+                                </dd>
+                            </dl>
+
+                            <h6><i class="fas fa-chart-area"></i> 显示设置</h6>
+                            <dl class="row">
+                                <dt class="col-sm-4">屏幕分辨率</dt>
+                                <dd class="col-sm-8 text-primary" th:text="${clientVO.screenResolution}"></dd>
+
+                                <dt class="col-sm-4">视口尺寸</dt>
+                                <dd class="col-sm-8 text-muted" th:text="${clientVO.viewportSize}"></dd>
+
+                                <dt class="col-sm-4">浏览器插件</dt>
+                                <dd class="col-sm-8">
+                                    <div th:each="plugin : ${clientVO.plugins != null ? clientVO.plugins.split(',\\s*') : T(java.util.Collections).emptyList()}"
+                                         class="badge badge-secondary mr-1"
+                                         th:text="${plugin}">
+                                    </div>
+                                </dd>
+
+
+
+                            </dl>
                         </div>
                     </div>
                 </div>
 
-                <!-- 网络信息 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">网络信息</div>
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-network-wired mr-2"
-                                   th:classappend="${client.connectionType == '4g'} ? 'fa-signal' :
-                                                 ${client.connectionType == 'wifi'} ? 'fa-wifi' : 'fa-ethernet'"></i>
-                                <span th:text="${client.connectionType.toUpperCase()}"></span>
-                                <span class="mx-2">|</span>
-                                <span th:text="${client.ip}"></span>
-                                <span th:if="${client.forwardedFor}" class="text-muted ml-2"
-                                      th:text="'(' + ${client.forwardedFor} + ')'"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 地理位置 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">地理位置</div>
-                        <div class="col-md-8">
-                            <i class="fas fa-map-marker-alt text-danger"></i>
-                            <span th:text="${client.country} + ' / ' + ${client.region} + ' / ' + ${client.city}"></span>
-                            <div class="text-muted small mt-1">
-                                坐标:
-                                <span th:text="${client.latitude}"></span>,
-                                <span th:text="${client.longitude}"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 设备信息 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">设备信息</div>
-                        <div class="col-md-8">
-                            <div class="mb-2">
-                                <span class="badge badge-info" th:text="${client.platform}"></span>
-                                <span class="mx-2">|</span>
-                                <span th:text="'CPU: ' + ${client.cpuCores} + '核'"></span>
-                                <span class="mx-2">|</span>
-                                <span th:text="'内存: ' + ${client.deviceMemory} + 'GB'"></span>
-                            </div>
-                            <div class="text-monospace small" th:text="${client.userAgent}"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 显示信息 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">显示设置</div>
-                        <div class="col-md-8">
-                            <span th:text="${client.screenResolution}"></span>
-                            <span class="mx-2">|</span>
-                            <span th:text="'视口: ' + ${client.viewportSize}"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 其他信息 -->
-                <div class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 font-weight-bold">附加信息</div>
-                        <div class="col-md-8">
-                            <div class="mb-1">
-                                <span th:text="'语言: ' + ${client.language}"></span>
-                                <span class="mx-2">|</span>
-                                <span>插件: </span>
-                                <span th:each="plugin : ${client.plugins.split(', ')}"
-                                      class="badge badge-secondary mr-1"
-                                      th:text="${plugin}"></span>
-                            </div>
-                        </div>
-                    </div>
+                <div th:if="${clientVO == null}" class="text-center text-muted">
+                    <i class="fas fa-exclamation-circle fa-2x"></i><br/>
+                    无法加载访问记录信息。
                 </div>
             </div>
         </div>
+        <div th:replace="admin-panel/element/snackbar :: snackbar"></div>
     </section>
-
-    <script>
-        $(document).ready(function() {
-            // 高亮重要信息
-            $('.list-group-item div.row:has(.font-weight-bold)').css('background-color', '#f8f9fa');
-        });
-    </script>
 
 </html>

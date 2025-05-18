@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin-panel/layout/layout :: layout(~{::title}, ~{::section}, ~{::script}, ~{::h4.page-title})">
+
+    <title>数据看板</title>
+
+    <h4 class="page-title pull-left">数据看板</h4>
+
+
+    <section>
+        <div id="cesiumContainer" style="width: 100%; height: 600px;"></div>
+    </section>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 多个IP地址位置信息
+                const ipList = /*[[${ipList}]]*/ [];
+
+                // 初始化 Cesium
+                /*<![CDATA[*/
+                Cesium.Ion.defaultAccessToken = /*[[${cesiumToken}]]*/ '';
+                /*]]>*/
+                const [terrainProvider, imageryProvider] = await Promise.all([
+                    Cesium.CesiumTerrainProvider.fromIonAssetId(1),
+                    Cesium.IonImageryProvider.fromAssetId(3)
+                ]);
+
+                const viewer = new Cesium.Viewer('cesiumContainer', {
+                    terrainProvider,
+                    imageryProvider,
+                    baseLayerPicker: true
+                });
+
+                // 遍历添加标记
+                ipList.forEach(ip => {
+                    viewer.entities.add({
+                        position: Cesium.Cartesian3.fromDegrees(ip.longitude, ip.latitude, 100),
+                        point: {
+                            pixelSize: 10,
+                            color: Cesium.Color.RED
+                        },
+                        label: {
+                            text: `${ip.country} · ${ip.region} · ${ip.city}`,
+                            font: '16px sans-serif',
+                            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                            outlineWidth: 2,
+                            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                            pixelOffset: new Cesium.Cartesian2(0, -20)
+                        }
+                    });
+                });
+
+                // 相机飞到第一个点（可自定义）
+                if (ipList.length > 0) {
+                    viewer.camera.flyTo({
+                        destination: Cesium.Cartesian3.fromDegrees(ipList[0].longitude, ipList[0].latitude, 10000),
+                        orientation: { pitch: -0.785 }
+                    });
+                }
+            } catch (e) {
+                console.error('初始化失败:', e);
+            }
+        });
+        /*]]>*/
+    </script>
+
+
+</html>

@@ -4,6 +4,8 @@ import java.util.*;
 
 import com.imyc.SBAP.Http.privilege.dao.Privilege;
 import com.imyc.SBAP.Http.privilege.dao.repository.PrivilegeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,17 @@ class DemoCommandLineRunner implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
+
+        Logger logger = LoggerFactory.getLogger(DemoCommandLineRunner.class);
+
+
+        // 判断用户是否已存在（比如通过用户名或邮箱判断）
+        Optional<User> existingUser = usersRepository.findByUsername("admin");
+        if (existingUser.isPresent()) {
+            // 如果已经有 admin 用户，就不再执行初始化
+            logger.info("Admin 用户已存在，跳过初始化逻辑");
+            return;
+        }
 
 		Date date = new Date();
 		
